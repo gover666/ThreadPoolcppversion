@@ -4,9 +4,10 @@
 #include<string.h>
 #include <iostream>
 using namespace std;
-ThreadPool::ThreadPool(int min, int max)
+template<typename T>
+ThreadPool<T>::ThreadPool(int min, int max)
 {
-    taskQ = new TaskQueue;
+    taskQ = new TaskQueue<int>;
     do
     {
         minNum = min;
@@ -58,8 +59,8 @@ ThreadPool::ThreadPool(int min, int max)
 
 }
 
-
-ThreadPool::~ThreadPool()
+template<typename T>
+ThreadPool<T>::~ThreadPool()
 {
   
 
@@ -87,8 +88,8 @@ ThreadPool::~ThreadPool()
     pthread_cond_destroy(&notEmpty);
 }
 
-
-void ThreadPool::threadPoolAdd(Task t)
+template<typename T>
+void ThreadPool<T>::threadPoolAdd(Task<T> t)
 {
 
    
@@ -103,8 +104,8 @@ void ThreadPool::threadPoolAdd(Task t)
   
 }
 
-
-int ThreadPool::threadPoolBusyNum()
+template<typename T>
+int ThreadPool<T>::threadPoolBusyNum()
 {
     pthread_mutex_lock(&mutexPool);
     int busyNum = this->busyNum;
@@ -112,8 +113,8 @@ int ThreadPool::threadPoolBusyNum()
     return busyNum;
 }
 
-
-int ThreadPool::threadPoolAliveNum()
+template<typename T>
+int ThreadPool<T>::threadPoolAliveNum()
 {
     pthread_mutex_lock(&mutexPool);
     int liveNum = this->liveNum;
@@ -121,8 +122,8 @@ int ThreadPool::threadPoolAliveNum()
     return liveNum;
 }
 
-
-void* ThreadPool::worker(void* arg)
+template<typename T>
+void* ThreadPool<T>::worker(void* arg)
 {
     ThreadPool* pool = static_cast<ThreadPool*>(arg);
 
@@ -158,7 +159,7 @@ void* ThreadPool::worker(void* arg)
         }
 
         // 从任务队列中取出一个任务
-        Task task=pool->taskQ->gettask();
+        Task<T> task=pool->taskQ->gettask();
        
         pool->busyNum++;
         pthread_mutex_unlock(&pool->mutexPool);
@@ -178,8 +179,8 @@ void* ThreadPool::worker(void* arg)
 
 }
 
-
-void* ThreadPool::manager(void* arg)
+template<typename T>
+void* ThreadPool<T>::manager(void* arg)
 {
     ThreadPool* pool = static_cast<ThreadPool*>(arg);
     while (!pool->shutdown)
@@ -231,8 +232,8 @@ void* ThreadPool::manager(void* arg)
     return nullptr;
 }
 
-
-void ThreadPool::threadExit()
+template<typename T>
+void ThreadPool<T>::threadExit()
 {
     pthread_t tid = pthread_self();
     for (int i = 0; i < maxNum; ++i)

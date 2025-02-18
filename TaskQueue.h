@@ -4,6 +4,7 @@
 
 //定义任务结构体
 using callback = void(*)(void* arg);
+template<typename T>
 struct Task
 {
 	Task()
@@ -14,13 +15,14 @@ struct Task
 	Task(callback f, void* arg)
 	{
 		function=f;
-		this->arg = arg;
+		this->arg = (int*)arg;
 	}
 	callback function;
-	void* arg;
+	T* arg;
 };
 
 //任务队列
+template<typename T>
 class TaskQueue
 {
 public:
@@ -28,11 +30,11 @@ public:
 	~TaskQueue();
 
 	//添加任务
-	void addTask(Task& t);
+	void addTask(Task<T> t);
 	void addTask(callback f, void* arg);
 
 	//取出一个任务
-	Task gettask();
+	Task<T> gettask();
 
 	//获取当前任务数量
 	inline size_t getTaskNum()
@@ -41,6 +43,6 @@ public:
 	}
 private:
 	pthread_mutex_t m_mutex;
-	std::queue<Task> m_TaskQ;
+	std::queue<Task<T>> m_TaskQ;
 };
 

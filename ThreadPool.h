@@ -2,9 +2,10 @@
 #include<pthread.h>
 #include<unistd.h>
 #include"TaskQueue.h"
+#include"TaskQueue.cpp"
 
 
-
+template<typename T>
 class ThreadPool
 {
 public:
@@ -12,7 +13,7 @@ public:
     ~ThreadPool();
 
     //给线程池添加任务
-    void threadPoolAdd(Task t);
+    void threadPoolAdd(Task<T> t);
 
     // 获取线程池中工作的线程的个数
     int threadPoolBusyNum();
@@ -31,7 +32,7 @@ public:
 
 
 private:
-    TaskQueue* taskQ;               //任务队列
+    TaskQueue<T>* taskQ;               //任务队列
     pthread_t managerID;            // 管理者线程ID
     pthread_t* threadIDs;
     pthread_cond_t notEmpty;        // 工作的线程ID
